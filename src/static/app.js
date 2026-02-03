@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const messageDiv = document.getElementById('message');
 
   // Store references for quick UI updates: { "Activity Name": { card, list, heading, max } }
-  const activityMap = {};
+  const activityMap = {}; 
 
   function showMessage(text, type = 'info') {
     messageDiv.textContent = text;
