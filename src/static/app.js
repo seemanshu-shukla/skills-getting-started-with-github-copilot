@@ -105,6 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Client-side capacity check
+    const entry = activityMap[activity];
+    if (entry) {
+      const currentParticipants = entry.list.querySelectorAll('li:not(.participant-empty)').length;
+      if (currentParticipants >= entry.max) {
+        showMessage('This activity is already full.', 'error');
+        return;
+      }
+    }
+
     // Disable submit while processing
     const submitButton = signupForm.querySelector('button[type="submit"]');
     submitButton.disabled = true;
@@ -124,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showMessage(resJson.message || 'Signed up successfully!', 'success');
 
       // Update UI:
-      const entry = activityMap[activity];
       if (entry) {
         // Remove empty placeholder if present
         const empty = entry.list.querySelector('.participant-empty');
@@ -134,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.textContent = email;
         entry.list.appendChild(li);
 
-        const newCount = entry.list.querySelectorAll('li').length;
+        const newCount = entry.list.querySelectorAll('li:not(.participant-empty)').length;
         updateParticipantsHeading(entry.heading, newCount, entry.max);
       }
 
