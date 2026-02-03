@@ -18,6 +18,74 @@ document.addEventListener('DOMContentLoaded', () => {
     el.textContent = `Participants (${count}/${max})`;
   }
 
+  // Create a participant list item with a delete button
+  function createParticipantListItem(email, activityName, entry) {
+    const li = document.createElement('li');
+
+    const span = document.createElement('span');
+    span.textContent = email;
+
+    const btn = document.createElement('button');
+    btn.className = 'delete-btn';
+    btn.setAttribute('aria-label', `Unregister ${email}`);
+    btn.textContent = '✖';
+
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm(`Unregister ${email} from ${activityName}?`)) return;
+      try {
+        const res = await fetch(`/activities/${encodeURIComponent(activityName)}/participants/${encodeURIComponent(email)}`, { method: 'DELETE' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const detail = data.detail || data.message || 'Failed to unregister';
+          showMessage(detail, 'error');
+          return;
+        }
+        // Refresh from server to keep UI in sync
+        await refreshActivity(activityName);
+        showMessage(data.message || `${email} unregistered`, 'success');
+      } catch (err) {
+        showMessage('Failed to unregister. Please try again.', 'error');
+        console.error(err);
+      }
+    });
+
+    li.appendChild(span);
+    li.appendChild(btn);
+    return li;
+  }
+
+  // Refresh participants for a specific activity from the server
+  async function refreshActivity(activityName) {
+    try {
+      const res = await fetch('/activities');
+      const data = await res.json();
+      const activity = data[activityName];
+      if (!activity) return;
+      const entry = activityMap[activityName];
+      if (!entry) return;
+
+      // Clear current list
+      entry.list.innerHTML = '';
+
+      if (!activity.participants || activity.participants.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'participant-empty';
+        li.textContent = 'No participants yet';
+        entry.list.appendChild(li);
+      } else {
+        activity.participants.forEach((email) => {
+          const li = createParticipantListItem(email, activityName, entry);
+          entry.list.appendChild(li);
+        });
+      }
+
+      updateParticipantsHeading(entry.heading, activity.participants.length, entry.max);
+    } catch (err) {
+      console.error('Failed to refresh activity', err);
+    }
+  }
+
   async function loadActivities() {
     activitiesList.innerHTML = '<p>Loading activities...</p>';
     try {
@@ -63,8 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ul.appendChild(li);
         } else {
           activity.participants.forEach((email) => {
-            const li = document.createElement('li');
-            li.textContent = email;
+            const li = createParticipantListItem(email, name, { list: ul, heading: h5, max: activity.max_participants });
             ul.appendChild(li);
           });
         }
@@ -133,18 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showMessage(resJson.message || 'Signed up successfully!', 'success');
 
-      // Update UI:
+      // Update UI from server to ensure consistent state
       if (entry) {
-        // Remove empty placeholder if present
-        const empty = entry.list.querySelector('.participant-empty');
-        if (empty) empty.remove();
-
-        const li = document.createElement('li');
-        li.textContent = email;
-        entry.list.appendChild(li);
-
-        const newCount = entry.list.querySelectorAll('li:not(.participant-empty)').length;
-        updateParticipantsHeading(entry.heading, newCount, entry.max);
+        await refreshActivity(activity);
       }
 
       signupForm.reset();

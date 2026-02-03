@@ -154,16 +154,18 @@ footer {
   font-weight: 600;
 }
 
-/* Bulleted list with visible markers and pretty items */
+/* Participant list (no bullets) */
 .participants-list {
-  list-style-type: disc;
-  list-style-position: outside;
-  margin: 8px 0 0 20px;
+  list-style: none;
+  margin: 8px 0 0 0;
   padding: 0;
 }
 
 .participants-list li {
-  display: list-item;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 8px;
   padding: 6px 10px;
   border-radius: 12px;
@@ -174,11 +176,25 @@ footer {
   box-shadow: 0 1px 0 rgba(0,0,0,0.02);
 }
 
-/* Color the bullet marker for a refined look */
+/* Hide bullet marker */
 .participants-list li::marker {
-  color: #283593;
-  font-size: 14px;
+  display: none;
 }
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #c62828;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.delete-btn:hover {
+  background: rgba(198,40,40,0.08);
+} 
 
 .participant-empty {
   display: list-item;
