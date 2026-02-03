@@ -154,38 +154,45 @@ footer {
   font-weight: 600;
 }
 
+/* Bulleted list with visible markers and pretty items */
 .participants-list {
   list-style-type: disc;
-  margin: 0 0 0 18px;
+  list-style-position: outside;
+  margin: 8px 0 0 20px;
   padding: 0;
 }
 
 .participants-list li {
-  display: inline-block;
+  display: list-item;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 12px;
   background: linear-gradient(180deg, #ffffff, #f7f8ff);
   border: 1px solid #e8eaf6;
-  padding: 6px 10px;
-  border-radius: 18px;
-  margin: 6px 8px 0 0;
   font-size: 13px;
   color: #1e293b;
   box-shadow: 0 1px 0 rgba(0,0,0,0.02);
 }
 
+/* Color the bullet marker for a refined look */
+.participants-list li::marker {
+  color: #283593;
+  font-size: 14px;
+}
+
 .participant-empty {
-  display: block;
+  display: list-item;
   color: #7b8a99;
   font-style: italic;
   background: none;
   border: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 8px 0;
 }
 
-/* Small responsive tweak so participant badges wrap nicely */
+/* Small responsive tweak so participant items wrap nicely on mobile */
 @media (max-width: 480px) {
   .participants-list li {
-    display: block;
-    margin-right: 0;
+    padding: 6px 8px;
   }
 }
